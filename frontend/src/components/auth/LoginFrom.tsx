@@ -18,6 +18,8 @@ const LoginForm = () => {
         console.log(res)
         if (res.message=="Login successful") {
             localStorage.setItem("token", res.token);
+            localStorage.setItem("user", JSON.stringify(res.user));
+
             toast.success("Login successfully done")
             setTimeout(() => {
                 router.push('/');

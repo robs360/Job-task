@@ -48,6 +48,7 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userData = req.body;
         const result = yield user_model_1.userModel.find({ email: userData.email });
+        console.log(result);
         if (result.length > 0) {
             const user = result[0];
             if (user.password === userData.password) {

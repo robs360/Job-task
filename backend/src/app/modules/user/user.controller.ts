@@ -37,12 +37,12 @@ const loginUser: RequestHandler = async (req, res) => {
         const userData: Partial<TUser> = req.body;
 
         const result = await userModel.find({ email: userData.email });
-
+        console.log(result)
         if (result.length > 0) {
             const user = result[0]
             if (user.password === userData.password) {
                 const token = jwt.sign(
-                    { name: user.name, image: user.image, email: user.email },
+                    {name: user.name, image: user.image, email: user.email },
                     "abcfeakljdfkl12@",
                     { expiresIn: '7h' }
                 );
