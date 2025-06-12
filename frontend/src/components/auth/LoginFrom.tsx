@@ -17,6 +17,7 @@ const LoginForm = () => {
         const res = await loginUser({ email: data.email, password: data.password })
         console.log(res)
         if (res.message=="Login successful") {
+            localStorage.setItem("token", res.token);
             toast.success("Login successfully done")
             setTimeout(() => {
                 router.push('/');

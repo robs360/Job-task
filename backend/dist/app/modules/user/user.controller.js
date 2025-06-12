@@ -19,12 +19,21 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userData = req.body;
-        const result = yield user_services_1.userServices.createUserIntoDB(userData);
-        res.status(200).json({
-            success: true,
-            message: "User created successfully",
-            data: result,
-        });
+        const existingUser = yield user_model_1.userModel.findOne({ email: userData.email });
+        if (existingUser) {
+            res.status(400).json({
+                success: false,
+                message: "Email already used",
+            });
+        }
+        else {
+            const result = yield user_services_1.userServices.createUserIntoDB(userData);
+            res.status(200).json({
+                success: true,
+                message: "User created successfully",
+                data: result,
+            });
+        }
     }
     catch (error) {
         console.error("Error creating user:", error);

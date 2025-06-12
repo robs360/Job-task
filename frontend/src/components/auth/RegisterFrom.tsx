@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { uploadImageToImgBB } from "@/services/ImgBB";
 import { RegisterUser } from "@/services/user";
+import toast from "react-hot-toast";
 
 const RegisterForm = () => {
 
@@ -26,8 +27,12 @@ const RegisterForm = () => {
                 ...data, image
             }
             const res = await RegisterUser(userData)
+            console.log(res)
             if (res.success) {
-                router.push('/lgoin')
+                router.push('/login')
+            }
+            else{
+                toast.error(`${res.message}`)
             }
         }
     }

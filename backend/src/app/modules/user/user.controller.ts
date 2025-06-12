@@ -6,13 +6,22 @@ import { TUser } from "./user.interface";
 const createUser: RequestHandler = async (req, res) => {
     try {
         const userData = req.body
+        const existingUser = await userModel.findOne({ email: userData.email });
 
-        const result = await userServices.createUserIntoDB(userData);
-        res.status(200).json({
-            success: true,
-            message: "User created successfully",
-            data: result,
-        });
+        if (existingUser) {
+            res.status(400).json({
+                success: false,
+                message: "Email already used",
+            });
+        }
+        else {
+            const result = await userServices.createUserIntoDB(userData);
+            res.status(200).json({
+                success: true,
+                message: "User created successfully",
+                data: result,
+            });
+        }
     } catch (error) {
         console.error("Error creating user:", error);
         res.status(500).json({
@@ -28,7 +37,7 @@ const loginUser: RequestHandler = async (req, res) => {
         const userData: Partial<TUser> = req.body;
 
         const result = await userModel.find({ email: userData.email });
-        
+
         if (result.length > 0) {
             const user = result[0]
             if (user.password === userData.password) {
