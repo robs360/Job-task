@@ -11,5 +11,6 @@ const router = express_1.default.Router();
 router.post('/create', auth_1.default, document_controller_1.documentController.createDocument);
 router.get('/', auth_1.default, document_controller_1.documentController.getAlldocument);
 router.get('/:id', auth_1.default, document_controller_1.documentController.getSingleDocument);
+router.put('/:id', auth_1.default, document_controller_1.documentController.updateDocument);
 router.delete('/:id', auth_1.default, document_controller_1.documentController.deleteDocument);
 exports.documentRoutes = router;
