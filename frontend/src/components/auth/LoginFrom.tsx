@@ -8,24 +8,22 @@ import { useRouter } from "next/navigation";
 import logo from '../../assets/google-docs.png'
 import google from '../../assets/google.png'
 import { signIn } from "next-auth/react"
+import { loginUser } from "@/services/user"
 const LoginForm = () => {
     const { register, handleSubmit } = useForm()
-    const router=useRouter()
+    const router = useRouter()
     const onSubmit = async (data: any) => {
         console.log(data);
-        // const res = await signIn("credentials", {
-        //     email: data.email,
-        //     password: data.password,
-        //     redirect: false,
-        // });
-        // if (res?.ok && res.url) {
-        //     window.location.href = res.url;
-        //     router.push('/')
-        //     toast.success("Login successfully done")
-        // } else {
-
-        //     console.error("Login failed", res?.error);
-        // }
+        const res = await loginUser({ email: data.email, password: data.password })
+        console.log(res)
+        if (res.message=="Login successful") {
+            toast.success("Login successfully done")
+            setTimeout(() => {
+                router.push('/');
+            }, 1500);
+        } else {
+            console.error("Login failed", res?.error);
+        }
     }
     return (
         <div>
