@@ -19,7 +19,6 @@ dotenv_1.default.config({ path: '.env.local' });
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            console.log("url ", process.env.database_url);
             yield mongoose_1.default.connect(process.env.database_url);
             app_1.app.listen(process.env.port, () => {
                 console.log(`server is running on port ${process.env.port}`);
