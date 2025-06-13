@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import dynamic from 'next/dynamic';
 import { ShareDocument } from '@/components/shared/ShareDocument';
+import { getSocket } from '@/utils/socket';
 
 
 const JoditEditor = dynamic(() => import('jodit-react'), { ssr: false });
@@ -58,6 +59,29 @@ export default function DocumentEditor() {
         return () => clearTimeout(timer);
     }, [content, title]);
 
+
+    useEffect(() => {
+        const socket = getSocket();
+
+        if (!id) return;
+
+        socket.emit('join-document', id);
+
+        socket.on('receive-changes', (newContent: string) => {
+            setContent(newContent);
+            console.log('asdfasdf')
+        });
+
+        return () => {
+            socket.disconnect();
+        };
+    }, [id]);
+
+      const handleContentChange = (newContent: string) => {
+        setContent(newContent);
+        const socket = getSocket();
+        socket.emit('send-changes', { documentId: id, content: newContent });
+    };
     if (loading) return <p>Loading document...</p>;
 
     return (
@@ -86,7 +110,7 @@ export default function DocumentEditor() {
                         <div className="border rounded-lg overflow-hidden">
                             <JoditEditor
                                 value={content}
-                                onChange={(newContent) => setContent(newContent)}
+                                onChange={handleContentChange}
                             />
                         </div>
                     )}

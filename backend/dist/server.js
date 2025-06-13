@@ -15,13 +15,40 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const app_1 = require("./app");
+const http_1 = require("http");
+const socket_io_1 = require("socket.io");
 dotenv_1.default.config({ path: '.env.local' });
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield mongoose_1.default.connect(process.env.database_url);
-            app_1.app.listen(process.env.port, () => {
-                console.log(`server is running on port ${process.env.port}`);
+            console.log("MongoDB connected");
+            // Create HTTP server
+            const httpServer = (0, http_1.createServer)(app_1.app);
+            // Create socket.io instance
+            const io = new socket_io_1.Server(httpServer, {
+                cors: {
+                    origin: '*',
+                    methods: ['GET', 'POST']
+                }
+            });
+            // Handle socket connections
+            io.on("connection", (socket) => {
+                console.log("User connected", socket.id);
+                socket.on('join-document', (documentId) => {
+                    socket.join(documentId);
+                    console.log(`User joined document room: ${documentId}`);
+                });
+                socket.on('send-changes', ({ documentId, content }) => {
+                    socket.to(documentId).emit('receive-changes', content);
+                });
+                socket.on('disconnect', () => {
+                    console.log("User disconnected", socket.id);
+                });
+            });
+            const PORT = process.env.port || 5000;
+            httpServer.listen(PORT, () => {
+                console.log(`Server is running on port ${PORT}`);
             });
         }
         catch (error) {
