@@ -5,7 +5,7 @@ import { documentModel } from "./document.interface";
 const createDocument: RequestHandler = async (req, res) => {
     try {
         const documentData = req.body
-        
+
         const result = await documentServices.createDocumentIntoDB(documentData)
         res.status(201).json(result);
     }
@@ -86,7 +86,46 @@ const updateDocument = async (req: any, res: any) => {
     }
 }
 
+
+const shareDocument = async (req: any, res: any) => {
+    const { email, role } = req.body;
+    const { id } = req.params;
+
+    if (!email || !role) {
+        return res.status(400).json({ error: 'Email and role are required' });
+    }
+    if (!['viewer', 'editor'].includes(role)) {
+        return res.status(400).json({ error: 'Invalid role' });
+    }
+
+    try {
+        const doc = await documentModel.findById(id);
+        if (!doc) return res.status(404).json({ error: 'Document not found' });
+
+        // Only owner can share
+        if (doc.owner !== req.user.email) {
+            return res.status(403).json({ error: 'Only owner can share this document' });
+        }
+
+        // Check if already shared with this email
+        const alreadyShared = doc.sharedWith.find(sw => sw.user === email);
+        if (alreadyShared) {
+            // Update role if needed
+            alreadyShared.role = role;
+        } else {
+            // Add new shared user
+            doc.sharedWith.push({ user: email, role });
+        }
+
+        await doc.save();
+        res.json({ message: 'Document shared successfully', sharedWith: doc.sharedWith });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+}
 export const documentController = {
     createDocument, deleteDocument,
-    getAlldocument, getSingleDocument, updateDocument
+    getAlldocument, getSingleDocument,
+    updateDocument, shareDocument
 }
