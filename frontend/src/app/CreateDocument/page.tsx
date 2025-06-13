@@ -1,7 +1,7 @@
 'use client'
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { FilePlus } from 'lucide-react';  // modern icon
+import { FilePlus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function CreateDocumentButton() {
@@ -18,13 +18,16 @@ export default function CreateDocumentButton() {
             setEmail(user.email);
         }
     }, []);
+
     console.log(email, " ", token)
+
     const createNewDocument = async () => {
         try {
-            const res = await axios.post(`${process.env.NEXT_PUBLIC_API_ENDPOINT}api/v1/document/create`, { title: 'Untitled Document', content: 'First Document', owner: email },
+            const res = await axios.post(`${process.env.NEXT_PUBLIC_API_ENDPOINT}api/v1/document/create`,
+                { title: 'Untitled Document', content: 'First Document', owner: email },
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`  // ✅ send token here
+                        Authorization: `Bearer ${token}`
                     }
                 }
             );
@@ -40,10 +43,10 @@ export default function CreateDocumentButton() {
         <div className="flex justify-center my-6">
             <button
                 onClick={createNewDocument}
-                className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold px-6 py-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                className="flex items-center gap-2 bg-white text-black font-semibold border border-gray-300 px-8 py-3 rounded-md shadow-sm hover:bg-gray-100 transition-all duration-300"
             >
-                <FilePlus className="w-5 h-5" />
-                Create New Document
+                <FilePlus className="w-5 h-5 text-blue-600" />
+                <span className="text-base">New Blank Document</span>
             </button>
         </div>
     );

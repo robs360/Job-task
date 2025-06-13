@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Pencil, Trash2 } from 'lucide-react';
+import Link from 'next/link';
 
 interface Document {
   _id: string;
@@ -15,26 +16,41 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [showType, setShowType] = useState<'owned' | 'shared'>('owned');
 
-  useEffect(() => {
-    const fetchDocs = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_ENDPOINT}api/v1/document`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+  const fetchDocs = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-        setOwnedDocs(res.data.ownedDocs);
-        setSharedDocs(res.data.sharedDocs);
-      } catch (err) {
-        alert('Failed to fetch documents');
-      } finally {
-        setLoading(false);
-      }
-    };
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_ENDPOINT}api/v1/document`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      setOwnedDocs(res.data.ownedDocs);
+      setSharedDocs(res.data.sharedDocs);
+    } catch (err) {
+      alert('Failed to fetch documents');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchDocs();
   }, []);
+
+  const handleDelete = async (id: string) => {
+    const token = localStorage.getItem("token");
+
+    await axios.delete(`${process.env.NEXT_PUBLIC_API_ENDPOINT}api/v1/document/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    // Refetch after successful deletion
+    fetchDocs();
+  }
 
   if (loading) return <p className="text-center text-lg mt-10">Loading...</p>;
 
@@ -71,11 +87,13 @@ export default function Dashboard() {
             {docsToShow.map(doc => (
               <div key={doc._id} className="bg-white p-5 rounded-xl shadow hover:shadow-lg transition relative">
                 <div className="absolute top-3 right-3 flex gap-2">
-                  <button className="bg-blue-100 p-2 rounded-full">
+
+                  <Link href={`/document/${doc._id}`}><button className="bg-blue-100 p-2 rounded-full">
                     <Pencil className="w-4 h-4 text-blue-600" />
-                  </button>
+                  </button></Link>
+
                   {showType === 'owned' && (
-                    <button className="bg-red-100 p-2 rounded-full">
+                    <button onClick={() => handleDelete(doc._id)} className="bg-red-100 p-2 rounded-full">
                       <Trash2 className="w-4 h-4 text-red-600" />
                     </button>
                   )}
@@ -85,10 +103,9 @@ export default function Dashboard() {
                 <p className="text-sm text-gray-500 mb-4">
                   Last updated: {new Date(doc.updatedAt).toLocaleString()}
                 </p>
-
-                <button className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium">
-                  Open
-                </button>
+                <Link href={`/document/${doc._id}`}><button className="bg-blue-500 w-full text-white p-2 rounded-full">
+                      Open
+                  </button></Link>
               </div>
             ))}
           </div>

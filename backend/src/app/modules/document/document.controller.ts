@@ -73,8 +73,9 @@ const updateDocument = async (req: any, res: any) => {
             }
 
             else {
-                const { content } = req.body;
+                const { content, title } = req.body;
                 if (content !== undefined) doc.content = content;
+                if (title !== undefined) doc.title = title;
 
                 await doc.save();
                 res.status(200).json(doc);
@@ -92,36 +93,44 @@ const shareDocument = async (req: any, res: any) => {
     const { id } = req.params;
 
     if (!email || !role) {
-        return res.status(400).json({ error: 'Email and role are required' });
+        res.status(400).json({ error: 'Email and role are required' });
     }
-    if (!['viewer', 'editor'].includes(role)) {
-        return res.status(400).json({ error: 'Invalid role' });
-    }
-
-    try {
-        const doc = await documentModel.findById(id);
-        if (!doc) return res.status(404).json({ error: 'Document not found' });
-
-        // Only owner can share
-        if (doc.owner !== req.user.email) {
-            return res.status(403).json({ error: 'Only owner can share this document' });
+    else {
+        if (!['viewer', 'editor'].includes(role)) {
+            res.status(400).json({ error: 'Invalid role' });
         }
 
-        // Check if already shared with this email
-        const alreadyShared = doc.sharedWith.find(sw => sw.user === email);
-        if (alreadyShared) {
-            // Update role if needed
-            alreadyShared.role = role;
-        } else {
-            // Add new shared user
-            doc.sharedWith.push({ user: email, role });
-        }
+        else {
+            try {
+                const doc = await documentModel.findById(id);
+                if (!doc) res.status(404).json({ error: 'Document not found' });
 
-        await doc.save();
-        res.json({ message: 'Document shared successfully', sharedWith: doc.sharedWith });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Server error' });
+                // Only owner can share
+                else {
+                    if (doc.owner !== req.user.email) {
+                         res.status(403).json({ error: 'Only owner can share this document' });
+                    }
+
+                    // Check if already shared with this email
+                    else {
+                        const alreadyShared = doc.sharedWith.find(sw => sw.user === email);
+                        if (alreadyShared) {
+                            // Update role if needed
+                            alreadyShared.role = role;
+                        } else {
+                            // Add new shared user
+                            doc.sharedWith.push({ user: email, role });
+                        }
+
+                        await doc.save();
+                        res.json({ message: 'Document shared successfully', sharedWith: doc.sharedWith });
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+                res.status(500).json({ error: 'Server error' });
+            }
+        }
     }
 }
 export const documentController = {

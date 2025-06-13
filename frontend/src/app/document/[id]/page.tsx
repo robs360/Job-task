@@ -4,136 +4,102 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import dynamic from 'next/dynamic';
+import { ShareDocument } from '@/components/shared/ShareDocument';
+
 
 const JoditEditor = dynamic(() => import('jodit-react'), { ssr: false });
 
 export default function DocumentEditor() {
-  const router = useRouter();
-  const params = useParams();
-  const id = params?.id as string;
+    const router = useRouter();
+    const params = useParams();
+    const id = params?.id as string;
 
-  const [content, setContent] = useState('');
-  const [title, setTitle] = useState('');
-  const [role, setRole] = useState('viewer');
-  const [loading, setLoading] = useState(true);
+    const [content, setContent] = useState('');
+    const [title, setTitle] = useState('');
+    const [role, setRole] = useState('viewer');
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!id) return;
-    const fetchDoc = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_ENDPOINT}api/v1/document/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setContent(res.data.document.content);
-        setTitle(res.data.document.title);
-        setRole(res.data.role);
-      } catch (err) {
-        alert('Error fetching document or access denied');
-        router.push('/dashboard');
-      } finally {
-        setLoading(false);
-      }
+    useEffect(() => {
+        if (!id) return;
+        const fetchDoc = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const res = await axios.get(`${process.env.NEXT_PUBLIC_API_ENDPOINT}api/v1/document/${id}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setContent(res.data.document.content);
+                setTitle(res.data.document.title);
+                setRole(res.data.role);
+            } catch (err) {
+
+                router.push('/dashboard');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchDoc();
+    }, [id, router]);
+
+    const saveDocument = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            await axios.put(`${process.env.NEXT_PUBLIC_API_ENDPOINT}api/v1/document/${id}`, { content, title }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+        } catch (err) {
+
+        }
     };
-    fetchDoc();
-  }, [id, router]);
 
-  const saveDocument = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.put(`${process.env.NEXT_PUBLIC_API_ENDPOINT}api/v1/document/${id}`, { content, title }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-    } catch (err) {
-      alert('Failed to save document');
-    }
-  };
+    // Auto-save with debounce
+    useEffect(() => {
+        if (loading) return;
+        const timer = setTimeout(saveDocument, 1000);
+        return () => clearTimeout(timer);
+    }, [content, title]);
 
-  // Auto-save with debounce
-  useEffect(() => {
-    if (loading) return;
-    const timer = setTimeout(saveDocument, 1000);
-    return () => clearTimeout(timer);
-  }, [content, title]);
+    if (loading) return <p>Loading document...</p>;
 
-  if (loading) return <p>Loading document...</p>;
+    return (
+        <div className="bg-gray-100 min-h-screen py-10 px-4">
+            <h1 className='text-2xl text-center font-semibold text-blue-600 mb-8'>
+                You are {role}
+            </h1>
 
-  return (
-    <div className="p-4 max-w-4xl mx-auto">
-      <input
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        disabled={role === 'viewer'}
-        placeholder="Document Title"
-        className="border p-2 mb-4 w-full text-xl font-semibold"
-      />
-      {role === 'viewer' ? (
-        <div className="border p-4 min-h-[400px] prose" dangerouslySetInnerHTML={{ __html: content }} />
-      ) : (
-        <JoditEditor
-          value={content}
-          onChange={(newContent) => setContent(newContent)}
-        />
-      )}
-    </div>
-  );
+            <div className="p-6 bg-white shadow-xl rounded-xl max-w-6xl mx-auto flex md:flex-row flex-col-reverse gap-8">
+
+                <div className="flex-1">
+                    <input
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        disabled={role === 'viewer'}
+                        placeholder="Document Title"
+                        className="border border-gray-300 p-3 mb-6 w-full text-2xl font-semibold rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none disabled:bg-gray-100"
+                    />
+
+                    {role === 'viewer' ? (
+                        <div className="border p-6 min-h-[400px] bg-gray-50 rounded-lg prose max-w-none">
+                            <div dangerouslySetInnerHTML={{ __html: content }} />
+                        </div>
+                    ) : (
+                        <div className="border rounded-lg overflow-hidden">
+                            <JoditEditor
+                                value={content}
+                                onChange={(newContent) => setContent(newContent)}
+                            />
+                        </div>
+                    )}
+                </div>
+
+                {role !== 'viewer' && role !== 'editor' && (
+                    <div className="w-full md:w-[300px]">
+                        <ShareDocument id={id} />
+                    </div>
+                )}
+            </div>
+        </div>
+
+    );
 }
 
-// const router = useRouter();
-//   const params = useParams();
-//   const id = params?.id as string;  // cast to string for TypeScript safety
-
-//   const [content, setContent] = useState('');
-//   const [title, setTitle] = useState('');
-//   const [role, setRole] = useState('viewer');
-//   const [loading, setLoading] = useState(true);
-
-//   useEffect(() => {
-//     if (!id) return;
-
-//     const fetchDoc = async () => {
-//       try {
-//         const token = localStorage.getItem("token");
-//         const res = await axios.get(`${process.env.NEXT_PUBLIC_API_ENDPOINT}api/v1/document/${id}`, {
-//           headers: {
-//             Authorization: `Bearer ${token}`
-//           }
-//         });
-//         setContent(res.data.document.content);
-//         setTitle(res.data.document.title);
-//         setRole(res.data.role);
-//       } catch (err) {
-//         alert('Error fetching document or access denied');
-//         router.push('/dashboard');
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchDoc();
-//   }, [id, router]);
-
-//   const saveDocument = async () => {
-//     try {
-//       const token = localStorage.getItem("token");
-//       await axios.put(`${process.env.NEXT_PUBLIC_API_ENDPOINT}api/v1/document/${id}`, { content, title }, {
-//         headers: {
-//           Authorization: `Bearer ${token}`
-//         }
-//       });
-//     } catch (err) {
-//       alert('Failed to save document');
-//     }
-//   };
-
-//   // Auto-save after debounce (2 seconds)
-//   useEffect(() => {
-//     if (loading) return;
-//     const timer = setTimeout(saveDocument, 2000);
-//     return () => clearTimeout(timer);
-//   }, [content, title]);
-
-//   if (loading) return <p>Loading document...</p>;
-
-// react-quill-new 
