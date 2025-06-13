@@ -13,7 +13,7 @@ export interface IDocument {
 
 const documentSchema = new Schema<IDocument>({
     title: { type: String, required: true, default: 'Untitled Document' },
-    content: { type: String, required: true, default: '' },
+    content: { type: String, required: true, default: 'Start Here...' },
     owner: { type: String, required: true },
     sharedWith: [
         {

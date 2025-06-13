@@ -4,7 +4,7 @@ exports.documentModel = void 0;
 const mongoose_1 = require("mongoose");
 const documentSchema = new mongoose_1.Schema({
     title: { type: String, required: true, default: 'Untitled Document' },
-    content: { type: String, required: true, default: '' },
+    content: { type: String, required: true, default: 'Start Here...' },
     owner: { type: String, required: true },
     sharedWith: [
         {

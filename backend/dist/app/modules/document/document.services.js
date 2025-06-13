@@ -12,7 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.documentServices = void 0;
 const document_interface_1 = require("./document.interface");
 const createDocumentIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(payload);
     const result = yield document_interface_1.documentModel.create(payload);
+    console.log("it is result", result);
     return result;
 });
 const deleteDocumentFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {

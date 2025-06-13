@@ -5,6 +5,7 @@ import { documentModel } from "./document.interface";
 const createDocument: RequestHandler = async (req, res) => {
     try {
         const documentData = req.body
+        
         const result = await documentServices.createDocumentIntoDB(documentData)
         res.status(201).json(result);
     }
@@ -72,7 +73,7 @@ const updateDocument = async (req: any, res: any) => {
             }
 
             else {
-                const {  content } = req.body;
+                const { content } = req.body;
                 if (content !== undefined) doc.content = content;
 
                 await doc.save();
@@ -87,5 +88,5 @@ const updateDocument = async (req: any, res: any) => {
 
 export const documentController = {
     createDocument, deleteDocument,
-    getAlldocument, getSingleDocument,updateDocument
+    getAlldocument, getSingleDocument, updateDocument
 }

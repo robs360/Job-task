@@ -47,17 +47,15 @@ export default function Dashboard() {
 
         <div className="flex justify-center gap-4 mb-8">
           <button
-            className={`px-5 py-2 rounded-full shadow-md transition-all duration-300 ${
-              showType === 'owned' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border'
-            }`}
+            className={`px-5 py-2 rounded-full shadow-md transition-all duration-300 ${showType === 'owned' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border'
+              }`}
             onClick={() => setShowType('owned')}
           >
             My Documents
           </button>
           <button
-            className={`px-5 py-2 rounded-full shadow-md transition-all duration-300 ${
-              showType === 'shared' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border'
-            }`}
+            className={`px-5 py-2 rounded-full shadow-md transition-all duration-300 ${showType === 'shared' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border'
+              }`}
             onClick={() => setShowType('shared')}
           >
             Shared With Me
@@ -73,11 +71,11 @@ export default function Dashboard() {
             {docsToShow.map(doc => (
               <div key={doc._id} className="bg-white p-5 rounded-xl shadow hover:shadow-lg transition relative">
                 <div className="absolute top-3 right-3 flex gap-2">
-                  <button className="bg-blue-100 p-2 rounded-full hover:bg-blue-200">
+                  <button className="bg-blue-100 p-2 rounded-full">
                     <Pencil className="w-4 h-4 text-blue-600" />
                   </button>
                   {showType === 'owned' && (
-                    <button className="bg-red-100 p-2 rounded-full hover:bg-red-200">
+                    <button className="bg-red-100 p-2 rounded-full">
                       <Trash2 className="w-4 h-4 text-red-600" />
                     </button>
                   )}
@@ -87,6 +85,10 @@ export default function Dashboard() {
                 <p className="text-sm text-gray-500 mb-4">
                   Last updated: {new Date(doc.updatedAt).toLocaleString()}
                 </p>
+
+                <button className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium">
+                  Open
+                </button>
               </div>
             ))}
           </div>

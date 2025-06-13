@@ -1,7 +1,9 @@
 import { documentModel, IDocument } from "./document.interface";
 
 const createDocumentIntoDB = async (payload: IDocument) => {
+    console.log(payload)
     const result = await documentModel.create(payload)
+    console.log("it is result",result)
     return result
 }
 
