@@ -28,7 +28,7 @@ function main() {
             // Create socket.io instance
             const io = new socket_io_1.Server(httpServer, {
                 cors: {
-                    origin: 'http://localhost:3000',
+                    origin: ['http://localhost:3000', 'https://job-task-client-two.vercel.app'],
                     methods: ['GET', 'POST']
                 }
             });

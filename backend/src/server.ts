@@ -18,12 +18,12 @@ async function main() {
         // Create socket.io instance
         const io = new Server(httpServer, {
             cors: {
-                origin: 'http://localhost:3000',
+                origin: ['http://localhost:3000', 'https://job-task-client-two.vercel.app'],
                 methods: ['GET', 'POST']
             }
         });
 
-        
+
         io.on("connection", (socket) => {
             console.log("User connected", socket.id);
 
