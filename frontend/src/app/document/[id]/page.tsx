@@ -48,7 +48,7 @@ export default function DocumentEditor() {
                 headers: { Authorization: `Bearer ${token}` }
             });
         } catch (err) {
-
+           router.push('/login')
         }
     };
 

@@ -35,6 +35,7 @@ export default function CreateDocumentButton() {
             router.push(`/document/${res.data._id}`);
 
         } catch (err) {
+            router.push('/login')
             alert('Error creating document');
         }
     };

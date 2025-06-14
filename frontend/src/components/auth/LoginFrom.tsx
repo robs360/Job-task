@@ -26,6 +26,7 @@ const LoginForm = () => {
             }, 1500);
         } else {
             console.error("Login failed", res?.error);
+            
         }
     }
     return (
