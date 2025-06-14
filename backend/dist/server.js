@@ -32,7 +32,6 @@ function main() {
                     methods: ['GET', 'POST']
                 }
             });
-            // Handle socket connections
             io.on("connection", (socket) => {
                 console.log("User connected", socket.id);
                 socket.on('join-document', (documentId) => {
@@ -46,7 +45,7 @@ function main() {
                     console.log("User disconnected", socket.id);
                 });
             });
-            const PORT = process.env.port || 5000;
+            const PORT = process.env.PORT || 5000;
             httpServer.listen(PORT, () => {
                 console.log(`Server is running on port ${PORT}`);
             });
