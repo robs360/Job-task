@@ -28,7 +28,7 @@ function main() {
             // Create socket.io instance
             const io = new socket_io_1.Server(httpServer, {
                 cors: {
-                    origin: '*',
+                    origin: 'http://localhost:3000',
                     methods: ['GET', 'POST']
                 }
             });

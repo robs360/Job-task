@@ -17,6 +17,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export function ShareDocument({ id }: { id: string }) {
     const [email, setEmail] = useState("");
@@ -26,17 +27,35 @@ export function ShareDocument({ id }: { id: string }) {
         const gettoken = localStorage.getItem('token');
         setToken(gettoken)
     }, [])
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        console.log("Email:", token);
-
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log("Email:", token);
+    
+    try {
         const res = await axios.post(
             `${process.env.NEXT_PUBLIC_API_ENDPOINT}api/v1/document/${id}/share`,
             { email, role },
             { headers: { Authorization: `Bearer ${token}` } }
         );
-    };
 
+        // ✅ If successful, show SweetAlert
+        Swal.fire({
+            icon: 'success',
+            title: 'Shared!',
+            text: 'Document successfully shared.',
+            confirmButtonText: 'OK'
+        });
+
+    } catch (error) {
+        console.error(error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: 'Failed to share the document.',
+            confirmButtonText: 'OK'
+        });
+    }
+};
     return (
         <Dialog>
             <DialogTrigger asChild>

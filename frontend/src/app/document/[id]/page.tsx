@@ -1,16 +1,17 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import axios from 'axios';
 import dynamic from 'next/dynamic';
 import { ShareDocument } from '@/components/shared/ShareDocument';
 import { getSocket } from '@/utils/socket';
 
-
+// Dynamic import of Jodit Editor
 const JoditEditor = dynamic(() => import('jodit-react'), { ssr: false });
 
 export default function DocumentEditor() {
+    const editor = useRef<any>(null);
     const router = useRouter();
     const params = useParams();
     const id = params?.id as string;
@@ -20,6 +21,13 @@ export default function DocumentEditor() {
     const [role, setRole] = useState('viewer');
     const [loading, setLoading] = useState(true);
 
+    // Memoized editor config
+    const editorConfig = useMemo(() => ({
+        readonly: role === 'viewer',
+        toolbar: role !== 'viewer',
+    }), [role]);
+
+    // Fetch document data on load
     useEffect(() => {
         if (!id) return;
         const fetchDoc = async () => {
@@ -31,8 +39,12 @@ export default function DocumentEditor() {
                 setContent(res.data.document.content);
                 setTitle(res.data.document.title);
                 setRole(res.data.role);
-            } catch (err) {
 
+                // After fetching, set editor value directly to prevent flickering
+                if (editor.current) {
+                    editor.current.setEditorValue(res.data.document.content);
+                }
+            } catch (err) {
                 router.push('/dashboard');
             } finally {
                 setLoading(false);
@@ -41,6 +53,7 @@ export default function DocumentEditor() {
         fetchDoc();
     }, [id, router]);
 
+    // Save document function (debounced below)
     const saveDocument = async () => {
         try {
             const token = localStorage.getItem("token");
@@ -48,18 +61,19 @@ export default function DocumentEditor() {
                 headers: { Authorization: `Bearer ${token}` }
             });
         } catch (err) {
-           router.push('/login')
+            router.push('/login')
         }
     };
 
-    // Auto-save with debounce
+    // Debounced auto-save (only when not viewer)
     useEffect(() => {
-        if (loading) return;
+        if (loading || role === "viewer") return;
+
         const timer = setTimeout(saveDocument, 1000);
         return () => clearTimeout(timer);
-    }, [content, title]);
+    }, [content, title, role, loading]);
 
-
+    // Socket.io integration
     useEffect(() => {
         const socket = getSocket();
 
@@ -69,7 +83,9 @@ export default function DocumentEditor() {
 
         socket.on('receive-changes', (newContent: string) => {
             setContent(newContent);
-            console.log('asdfasdf')
+            if (editor.current) {
+                editor.current.setEditorValue(newContent);
+            }
         });
 
         return () => {
@@ -77,11 +93,18 @@ export default function DocumentEditor() {
         };
     }, [id]);
 
-      const handleContentChange = (newContent: string) => {
-        setContent(newContent);
-        const socket = getSocket();
-        socket.emit('send-changes', { documentId: id, content: newContent });
-    };
+    // Handle editor content change
+    const handleContentChange = useCallback((newContent: string) => {
+        setContent(prev => {
+            if (prev !== newContent) {
+                const socket = getSocket();
+                socket.emit('send-changes', { documentId: id, content: newContent });
+                return newContent;
+            }
+            return prev;
+        });
+    }, [id]);
+
     if (loading) return <p>Loading document...</p>;
 
     return (
@@ -108,9 +131,14 @@ export default function DocumentEditor() {
                         </div>
                     ) : (
                         <div className="border rounded-lg overflow-hidden">
+                            {/* @ts-ignore to ignore typescript warning for setEditorValue usage */}
                             <JoditEditor
+                                ref={editor}
                                 value={content}
-                                onChange={handleContentChange}
+                                config={editorConfig}
+                                onChange={(newContent) => {
+                                    handleContentChange(newContent);
+                                }}
                             />
                         </div>
                     )}
@@ -123,7 +151,5 @@ export default function DocumentEditor() {
                 )}
             </div>
         </div>
-
     );
 }
-
