@@ -18,14 +18,13 @@ const app_1 = require("./app");
 const http_1 = require("http");
 const socket_io_1 = require("socket.io");
 dotenv_1.default.config({ path: '.env.local' });
+const documentUsers = {};
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield mongoose_1.default.connect(process.env.database_url);
             console.log("MongoDB connected");
-            // Create HTTP server
             const httpServer = (0, http_1.createServer)(app_1.app);
-            // Create socket.io instance
             const io = new socket_io_1.Server(httpServer, {
                 cors: {
                     origin: ['http://localhost:3000', 'https://job-task-client-two.vercel.app'],
@@ -34,15 +33,29 @@ function main() {
             });
             io.on("connection", (socket) => {
                 console.log("User connected", socket.id);
-                socket.on('join-document', (documentId) => {
+                // Updated join-document event to include user info
+                socket.on('join-document', ({ documentId, user }) => {
                     socket.join(documentId);
-                    console.log(`User joined document room: ${documentId}`);
+                    console.log(`${user.name} joined document ${documentId}`);
+                    if (!documentUsers[documentId]) {
+                        documentUsers[documentId] = [];
+                    }
+                    const existing = documentUsers[documentId].find(u => u.image === user.image);
+                    if (!existing) {
+                        documentUsers[documentId].push({ socketId: socket.id, image: user.image, name: user.name });
+                    }
+                    // Broadcast current online users in this document
+                    io.to(documentId).emit('document-users', documentUsers[documentId]);
                 });
                 socket.on('send-changes', ({ documentId, content }) => {
                     socket.to(documentId).emit('receive-changes', content);
                 });
                 socket.on('disconnect', () => {
                     console.log("User disconnected", socket.id);
+                    for (const documentId in documentUsers) {
+                        documentUsers[documentId] = documentUsers[documentId].filter(user => user.socketId !== socket.id);
+                        io.to(documentId).emit('document-users', documentUsers[documentId]);
+                    }
                 });
             });
             const PORT = process.env.PORT || 5000;
