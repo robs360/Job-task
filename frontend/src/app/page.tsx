@@ -22,19 +22,19 @@ export default function Home() {
           <CreateDocumentButton></CreateDocumentButton>
 
           {/* Existing Templates */}
-          <div className="h-48 w-[160px] bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden flex items-center justify-center">
+          <div className="h-48 mx-auto w-[160px] bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden flex items-center justify-center">
             <Image src={docs} alt="doc" width={160} height={200} className="object-contain" />
           </div>
 
-          <div className="h-48 w-[160px] bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden flex items-center justify-center">
+          <div className="h-48 w-[160px] mx-auto bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden flex items-center justify-center">
             <Image src={docs1} alt="doc" width={160} height={200} className="object-contain" />
           </div>
 
-          <div className="h-48 w-[160px] bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden flex items-center justify-center">
+          <div className="h-48 w-[160px] mx-auto bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden flex items-center justify-center">
             <Image src={doc3} alt="doc" width={160} height={200} className="object-contain" />
           </div>
 
-          <div className="h-48 w-[160px] bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden flex items-center justify-center">
+          <div className="h-48 w-[160px] mx-auto bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden flex items-center justify-center">
             <Image src={doc2} alt="doc" width={160} height={200} className="object-contain" />
           </div>
         </div>

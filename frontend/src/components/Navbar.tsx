@@ -3,10 +3,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import logo from '../assets/docs.jpg';
 import { useEffect, useState } from 'react';
+import { LogOut } from 'lucide-react';
+import { signOut } from 'next-auth/react';
 
 export default function Navbar() {
   const [userImage, setUserImage] = useState<string | null>(null);
-
+  const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
     const userData = localStorage.getItem('user');
     if (userData) {
@@ -18,6 +20,13 @@ export default function Navbar() {
       }
     }
   }, []);
+
+  const handleLogOut = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    signOut()
+    window.location.href = '/login';
+  };
 
   return (
     <div className="bg-white shadow-sm border-b border-gray-200">
@@ -48,16 +57,34 @@ export default function Navbar() {
         </div>
 
         {/* Right: User Image */}
-        <div>
-          {userImage ? (
-            <img
-              src={userImage}
-              alt="User"
-              
-              className="rounded-full border h-[40px] w-[40px] border-gray-300 shadow-sm object-cover"
-            />
-          ) : (
-            <div className="w-10 h-10 rounded-full bg-gray-300 animate-pulse"></div>
+        <div className="relative inline-block text-left">
+          <div onClick={() => setIsOpen(!isOpen)} className="cursor-pointer">
+            {userImage ? (
+              <img
+                src={userImage}
+                alt="User"
+                className="rounded-full border h-[42px] w-[42px] border-gray-300 shadow object-cover transition hover:scale-105"
+              />
+            ) : (
+              <div className="w-[42px] h-[42px] rounded-full bg-gray-300 animate-pulse"></div>
+            )}
+          </div>
+
+          {isOpen && (
+            <div
+              className="absolute right-0 mt-2 w-40 origin-top-right bg-white border border-gray-200 rounded-lg shadow-xl transition-all duration-300 z-50"
+            >
+              <button
+                onClick={() => {
+                  handleLogOut()
+                  setIsOpen(false);
+                }}
+                className="flex items-center gap-2 w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition"
+              >
+                <LogOut className="text-lg text-red-500 size-6" />
+                Logout
+              </button>
+            </div>
           )}
         </div>
       </nav>

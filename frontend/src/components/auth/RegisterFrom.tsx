@@ -29,7 +29,10 @@ const RegisterForm = () => {
             const res = await RegisterUser(userData)
             console.log(res)
             if (res.success) {
-                router.push('/login')
+                toast.success('You are now registered')
+                setTimeout(()=>{
+                    router.push('/login')
+                },500)
             }
             else{
                 toast.error(`${res.message}`)

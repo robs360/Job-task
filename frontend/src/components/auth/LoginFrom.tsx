@@ -13,15 +13,24 @@ import { loginUser } from "@/services/user"
 import { handleGooglelogin } from "@/services/GoogleLogin"
 import { useEffect } from "react"
 const LoginForm = () => {
-    const { data: session, status }: any = useSession();
+    const { data: session, status, update }: any = useSession();
 
     const { register, handleSubmit } = useForm()
     const router = useRouter()
     useEffect(() => {
-        if (status === "authenticated" && session?.user) {
-            handleGooglelogin({ session, status, router });
+        if (status === "authenticated" && session?.user && localStorage.getItem("count") === "1") {
+            setTimeout(() => {
+                handleGooglelogin({ session, status: "authenticated", router });
+                localStorage.removeItem("count");
+            }, 600);
         }
     }, [status, session, router]);
+    const handleGoogleClick = async () => {
+        localStorage.setItem("count", "1");
+        const result = await signIn("google", { redirect: false });
+
+    };
+
     const onSubmit = async (data: any) => {
         console.log(data);
         const res = await loginUser({ email: data.email, password: data.password })
@@ -63,7 +72,7 @@ const LoginForm = () => {
                 <div className="space-y-3">
 
                     <button
-                        onClick={() => signIn('google', { redirect: false })}
+                        onClick={handleGoogleClick}
                         className="flex items-center justify-center w-full h-[45px] border border-gray-400 rounded-md space-x-3 hover:bg-gray-50 transition"
                     >
                         <Image src={google} height={24} width={24} alt="Google" />
@@ -84,3 +93,15 @@ const LoginForm = () => {
     )
 }
 export default LoginForm
+
+
+// console.log("It is result ", result)
+// if (result?.ok) {
+
+//     await update();
+//     setTimeout(() => {
+//         handleGooglelogin({ session, status: "authenticated", router });
+//     }, 600);
+// } else {
+//     console.log("Google login failed", result);
+// }
