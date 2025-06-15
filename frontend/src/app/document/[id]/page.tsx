@@ -61,7 +61,7 @@ useEffect(() => {
                     editor.current.setEditorValue(res.data.document.content);
                 }
             } catch (err) {
-                router.push('/dashboard');
+                router.push('/login');
             } finally {
                 setLoading(false);
             }

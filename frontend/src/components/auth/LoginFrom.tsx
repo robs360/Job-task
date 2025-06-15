@@ -7,16 +7,26 @@ import toast from "react-hot-toast"
 import { useRouter } from "next/navigation";
 import logo from '../../assets/google-docs.png'
 import google from '../../assets/google.png'
-import { signIn } from "next-auth/react"
+import { signIn, useSession } from "next-auth/react"
 import { loginUser } from "@/services/user"
+
+import { handleGooglelogin } from "@/services/GoogleLogin"
+import { useEffect } from "react"
 const LoginForm = () => {
+    const { data: session, status }: any = useSession();
+
     const { register, handleSubmit } = useForm()
     const router = useRouter()
+    useEffect(() => {
+        if (status === "authenticated" && session?.user) {
+            handleGooglelogin({ session, status, router });
+        }
+    }, [status, session, router]);
     const onSubmit = async (data: any) => {
         console.log(data);
         const res = await loginUser({ email: data.email, password: data.password })
-        console.log(res)
-        if (res.message=="Login successful") {
+
+        if (res.message == "Login successful") {
             localStorage.setItem("token", res.token);
             localStorage.setItem("user", JSON.stringify(res.user));
 
@@ -26,9 +36,10 @@ const LoginForm = () => {
             }, 1500);
         } else {
             console.error("Login failed", res?.error);
-            
+
         }
     }
+
     return (
         <div>
             <div className="bg-white mt-16 p-8 rounded-2xl shadow-2xl w-[360px] md:w-[475px] lg:w-[420px] mx-auto space-y-6">
@@ -51,13 +62,14 @@ const LoginForm = () => {
                 </form>
                 <div className="space-y-3">
 
-                    <button onClick={() => { signIn('google', { callbackUrl: 'http://localhost:3000/' }) }}
-
+                    <button
+                        onClick={() => signIn('google', { redirect: false })}
                         className="flex items-center justify-center w-full h-[45px] border border-gray-400 rounded-md space-x-3 hover:bg-gray-50 transition"
                     >
                         <Image src={google} height={24} width={24} alt="Google" />
                         <span className="font-medium text-gray-700">Continue with Google</span>
                     </button>
+
                 </div>
 
                 {/* Link to Register */}

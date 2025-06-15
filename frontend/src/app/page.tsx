@@ -7,6 +7,7 @@ import doc3 from '../assets/img3.png'
 import Link from "next/link";
 import Dashboard from "./AllDocument/page";
 import Navbar from "@/components/Navbar";
+import CreateDocumentButton from "./CreateDocument/page";
 
 export default function Home() {
   return (
@@ -18,14 +19,7 @@ export default function Home() {
 
         <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           {/* Create New Docs */}
-          <Link href={'/CreateDocument'}>
-            <div className="w-[160px] flex flex-col items-center justify-center h-48 bg-white rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition cursor-pointer">
-              <div className="flex items-center justify-center bg-blue-100 rounded-full p-4 mb-3">
-                <Plus className="text-blue-500 size-8" />
-              </div>
-              <h1 className="font-medium text-gray-700 text-center">Create New Docs</h1>
-            </div>
-          </Link>
+          <CreateDocumentButton></CreateDocumentButton>
 
           {/* Existing Templates */}
           <div className="h-48 w-[160px] bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden flex items-center justify-center">

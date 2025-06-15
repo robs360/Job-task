@@ -1,7 +1,8 @@
 'use client'
 import axios from 'axios';
+import { Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { FilePlus } from 'lucide-react';
+
 import { useEffect, useState } from 'react';
 
 export default function CreateDocumentButton() {
@@ -41,13 +42,13 @@ export default function CreateDocumentButton() {
     };
 
     return (
-        <div className="flex justify-center my-6">
+        <div className="flex justify-center">
             <button
                 onClick={createNewDocument}
-                className="flex items-center gap-2 bg-white text-black font-semibold border border-gray-300 px-8 py-3 rounded-md shadow-sm hover:bg-gray-100 transition-all duration-300"
+                className=" w-[160px] h-[194px] items-center gap-2 bg-white text-black font-semibold p-5 rounded-md shadow-sm hover:bg-gray-100 transition-all duration-300"
             >
-                <FilePlus className="w-5 h-5 text-blue-600" />
-                <span className="text-base">New Blank Document</span>
+                 <Plus className='text-blue-500 size-14 mx-auto'></Plus>   
+                <span className="text-base">New Blank Docs</span>
             </button>
         </div>
     );

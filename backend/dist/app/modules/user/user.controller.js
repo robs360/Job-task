@@ -76,6 +76,32 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(500).json({ message: 'Internal server error', error });
     }
 });
+const googleLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userData = req.body;
+        const user = yield user_model_1.userModel.findOne({ email: userData.email });
+        let id = user === null || user === void 0 ? void 0 : user._id;
+        if (!user) {
+            const insetData = yield user_model_1.userModel.create(userData);
+            id = insetData._id;
+        }
+        const token = jsonwebtoken_1.default.sign({ name: userData.name, image: userData.image, email: userData.email }, "abcfeakljdfkl12@", { expiresIn: '7h' });
+        res.status(200).json({
+            success: true,
+            message: 'Login successful',
+            token,
+            user: {
+                id: id,
+                name: userData.name,
+                email: userData.email,
+                image: userData.image
+            }
+        });
+    }
+    catch (err) {
+        res.status(500).json({ success: false, message: 'Enternal server err', error: err });
+    }
+});
 exports.userController = {
-    createUser, loginUser
+    createUser, loginUser, googleLogin
 };

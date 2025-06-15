@@ -42,7 +42,7 @@ const loginUser: RequestHandler = async (req, res) => {
             const user = result[0]
             if (user.password === userData.password) {
                 const token = jwt.sign(
-                    {name: user.name, image: user.image, email: user.email },
+                    { name: user.name, image: user.image, email: user.email },
                     "abcfeakljdfkl12@",
                     { expiresIn: '7h' }
                 );
@@ -71,6 +71,37 @@ const loginUser: RequestHandler = async (req, res) => {
     }
 };
 
+
+const googleLogin: RequestHandler = async (req, res) => {
+    try {
+        const userData = req.body
+        const user = await userModel.findOne({ email: userData.email })
+        let id: any = user?._id
+        if (!user) {
+            const insetData = await userModel.create(userData)
+            id = insetData._id
+        }
+        const token = jwt.sign(
+            { name: userData.name, image: userData.image, email: userData.email },
+            "abcfeakljdfkl12@",
+            { expiresIn: '7h' }
+        );
+        res.status(200).json({
+            success: true,
+            message: 'Login successful',
+            token,
+            user: {
+                id: id,
+                name: userData.name,
+                email: userData.email,
+                image: userData.image
+            }
+        });
+    }
+    catch (err) {
+        res.status(500).json({ success: false, message: 'Enternal server err', error: err });
+    }
+}
 export const userController = {
-    createUser, loginUser
+    createUser, loginUser, googleLogin
 }

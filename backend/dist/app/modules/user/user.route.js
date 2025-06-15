@@ -9,4 +9,5 @@ const user_controller_1 = require("./user.controller");
 const router = express_1.default.Router();
 router.post('/register', user_controller_1.userController.createUser);
 router.post('/login', user_controller_1.userController.loginUser);
+router.post('/google/login', user_controller_1.userController.googleLogin);
 exports.userRoutes = router;

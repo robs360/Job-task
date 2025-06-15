@@ -50,12 +50,11 @@ export default function Navbar() {
         {/* Right: User Image */}
         <div>
           {userImage ? (
-            <Image
+            <img
               src={userImage}
               alt="User"
-              width={42}
-              height={42}
-              className="rounded-full border border-gray-300 shadow-sm object-cover"
+              
+              className="rounded-full border h-[40px] w-[40px] border-gray-300 shadow-sm object-cover"
             />
           ) : (
             <div className="w-10 h-10 rounded-full bg-gray-300 animate-pulse"></div>
