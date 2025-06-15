@@ -38,15 +38,45 @@
 ## 🏗️ Project Structure
 
 ```bash
+project-root/
+│
 ├── frontend/              # Next.js Frontend App
-│   ├── app/
-│   ├── components/
-│   ├── services/
-│   └── utils/
+│   ├── src/               
+│   │   ├── app/           # Next.js app directory (routes, pages)
+│   │   ├── components/    # React components
+│   │   ├── services/      # Axios services
+│   │   └── utils/         # Helper functions, socket.io utils
+│   │
+│   └── package.json       
 │
 ├── backend/               # Express.js Backend App
-│   ├── dist/
 │   ├── src/
-│ 
+│   │   ├── middleware/    
+│   │   │   └── authMiddleware.ts
+│   │   │   └── errorMiddleware.ts
+│   │
+│   │   ├── module/
+│   │   │
+│   │   │   ├── document/
+│   │   │   │   ├── document.controller.ts
+│   │   │   │   ├── document.interface.ts
+│   │   │   │   ├── document.model.ts
+│   │   │   │   ├── document.route.ts
+│   │   │   │   └── document.service.ts
+│   │   │
+│   │   │   ├── user/
+│   │   │   │   ├── user.controller.ts
+│   │   │   │   ├── user.interface.ts
+│   │   │   │   ├── user.model.ts
+│   │   │   │   ├── user.route.ts
+│   │   │   │   └── user.service.ts
+│   │
+│   │   └── app.ts         
+│   │   └── server.ts      
 │
-└── README.md
+│   └── package.json       
+│
+├── README.md              
+├── .env.local             
+└── .gitignore
+
